@@ -1,0 +1,140 @@
+import express from "express";
+import * as process from "process";
+import bcrypt from "bcryptjs"
+import {CustomResponse} from "../dtos/custom.response";
+import UserModel from "../models/user.model";
+import {UserInterface} from "../types/SchemaTypes";
+import jwt, {Secret} from "jsonwebtoken";
+
+export const createUser = async (req : express.Request, res:any) => {
+
+    try {
+
+        let user_by_email : UserInterface | null = await UserModel.findOne({email:req.body.email});
+
+        if (user_by_email){
+            res.status(409).send(
+                new CustomResponse(409,"Email already used!")
+            )
+        }else {
+
+            let user_by_username : UserInterface | null = await UserModel.findOne({username:req.body.username});
+
+            if (user_by_username){
+
+                res.status(409).send(
+                    new CustomResponse(409,"Username already used!")
+                )
+
+            }else {
+
+                bcrypt.hash(req.body.password, 8, async function (err, hash :string) {
+
+                    let userModel =  new UserModel({
+                        username: req.body.username,
+                        fullName: req.body.fullName,
+                        email: req.body.email,
+                        phoneNumber: req.body.phoneNumber,
+                        password: hash,
+                        proPic: "proPic"
+                    });
+
+                    let user: UserInterface | null = await userModel.save()
+
+                    if (user){
+                        user.password="";
+                        res.status(200).send(
+                            new CustomResponse(
+                                200, "User saved successfully",user
+                            )
+                        );
+                    }else {
+                        res.status(500).send(
+                            new CustomResponse(500,`Something went wrong!`)
+                        )
+                    }
+
+                })
+
+            }
+
+        }
+
+
+    }catch (error){
+        res.status(500).send(
+            new CustomResponse(500,`Error : ${error}`)
+        )
+    }
+
+}
+
+export const updateUser = async (req :express.Request, res :any) => {
+
+}
+
+export const deleteUser = async (req :express.Request, res :express.Response) => {
+
+}
+
+export const getAllUser = async (req :express.Request, res :express.Response) => {
+
+}
+
+export const authUser = async (req :express.Request, res :any) => {
+
+    try {
+
+        let user : UserInterface | null = await UserModel.findOne({username:req.body.username});
+
+        if (user){
+
+            let isMache :boolean = await bcrypt.compare(req.body.password, user.password);
+
+            if (isMache) {
+
+                generateToken(user,res);
+
+            }else {
+                res.status(401).json(
+                    new CustomResponse(401,"Wrong Password!!!")
+                )
+            }
+
+        } else {
+            res.status(404).send(
+                new CustomResponse(404, "User not found!")
+            )
+        }
+
+    }catch (error){
+        res.status(500).send(
+            new CustomResponse(500,`Error : ${error}`)
+        )
+    }
+
+}
+
+const generateToken = (user: UserInterface, res :express.Response) => {
+    user.password = "";
+    let expiresIn = "1w";
+
+    jwt.sign({user}, process.env.SECRET as Secret, {expiresIn}, (error :any,token :any) => {
+        if (error){
+            res.status(500).send(
+                new CustomResponse(500,`Something went wrong : ${error}`)
+            )
+        } else {
+
+            let res_body={
+                user: user,
+                accessToken: token
+            }
+
+            res.status(200).send(
+                new CustomResponse(200,"Access",res_body)
+            );
+
+        }
+    });
+}
