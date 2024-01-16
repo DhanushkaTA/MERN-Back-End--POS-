@@ -6,5 +6,6 @@ export interface UserInterface extends mongoose.Document{
     email: string,
     phoneNumber: number,
     password: string,
+    role: string,
     proPic: string
 }

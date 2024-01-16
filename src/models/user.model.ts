@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema<SchemaType.UserInterface>({
     email:{type:String, required:true},
     phoneNumber:{type:Number, required:true},
     password:{type:String, required:true},
+    role:{type:String, required:true},
     proPic:{type:String, required:true}
 })
 

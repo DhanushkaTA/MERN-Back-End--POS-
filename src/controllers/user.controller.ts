@@ -36,6 +36,7 @@ export const createUser = async (req : express.Request, res:any) => {
                         email: req.body.email,
                         phoneNumber: req.body.phoneNumber,
                         password: hash,
+                        role: req.body.role,
                         proPic: "proPic"
                     });
 
@@ -74,7 +75,15 @@ export const updateUser = async (req :express.Request, res :any) => {
 }
 
 export const deleteUser = async (req :express.Request, res :express.Response) => {
+    try {
 
+
+
+    }catch (error){
+        res.status(500).send(
+            new CustomResponse(500,`Error : ${error}`)
+        )
+    }
 }
 
 export const getAllUser = async (req :express.Request, res :express.Response) => {
