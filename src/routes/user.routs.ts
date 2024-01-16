@@ -7,11 +7,11 @@ let router = express.Router();
 // Create user
 router.post('/save', UserController.createUser)
 
-router.put('/update', UserController.updateUser)
+router.put('/update', VerifyToken.verifyToken, UserController.updateUser)
 
 router.get('/get/all', VerifyToken.verifyToken, UserController.getAllUser)
 
-router.delete('/delete', UserController.deleteUser)
+router.delete('/delete', VerifyToken.verifyToken, UserController.deleteUser)
 
 router.post('/auth', UserController.authUser)
 

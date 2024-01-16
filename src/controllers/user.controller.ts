@@ -5,6 +5,7 @@ import {CustomResponse} from "../dtos/custom.response";
 import UserModel from "../models/user.model";
 import {UserInterface} from "../types/SchemaTypes";
 import jwt, {Secret} from "jsonwebtoken";
+import userModel from "../models/user.model";
 
 export const createUser = async (req : express.Request, res:any) => {
 
@@ -71,13 +72,85 @@ export const createUser = async (req : express.Request, res:any) => {
 }
 
 export const updateUser = async (req :express.Request, res :any) => {
-
-}
-
-export const deleteUser = async (req :express.Request, res :express.Response) => {
     try {
 
+        let user_by_username = await userModel.findOne({_id: req.body.id});
 
+        if (user_by_username){
+
+            bcrypt.hash(req.body.password, 8, async function (err, hash :string) {
+
+                await UserModel.findByIdAndUpdate(
+                    {_id:req.body.id},
+                    {
+                        username:req.body.username,
+                        fullName:req.body.fullName,
+                        email:req.body.email,
+                        phoneNumber:req.body.phoneNumber,
+                        password:hash,
+                        role:req.body.role,
+                        proPic:req.body.proPic
+                    }
+                ).then( success => {
+
+                    if (success){
+                        success.password="";
+
+                        res.status(200).send(
+                            new CustomResponse(200,"User update successfully",success)
+                        )
+                    }
+
+                }).catch(error => {
+                    res.status(500).send(
+                        new CustomResponse(500,`Error : ${error}`)
+                    )
+                })
+
+            })
+
+        }else {
+            res.status(404).send(
+                new CustomResponse(404,`User not found!!!`)
+            )
+        }
+
+
+    }catch (error){
+        res.status(500).send(
+            new CustomResponse(500,`Error : ${error}`)
+        )
+    }
+}
+
+export const deleteUser = async (req :express.Request, res :any) => {
+    try {
+
+        let query_string :any = req.query;
+        let id :string = query_string.id;
+
+        //is my account or not
+        if (res.tokenData.user._id != id){
+            //if is not my account then check user role is admin
+            if (res.tokenData.user.role === "admin"){
+
+                await UserModel.deleteOne({_id:id}).then( success => {
+                    res.status(200).send(
+                        new CustomResponse(200, "User delete successfully")
+                    );
+                }).catch(error => {
+                    res.status(500).send(
+                        new CustomResponse(500, `Something went wrong : ${error}`)
+                    );
+                })
+
+            } else {
+                res.status(401).send(
+                    new CustomResponse(401,"Access Denied")
+                )
+            }
+
+        }
 
     }catch (error){
         res.status(500).send(
