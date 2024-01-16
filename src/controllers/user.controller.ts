@@ -78,7 +78,36 @@ export const deleteUser = async (req :express.Request, res :express.Response) =>
 }
 
 export const getAllUser = async (req :express.Request, res :express.Response) => {
+    try {
 
+        let query_string :any=req.query;
+        let size :number = query_string.size;
+        let page :number = query_string.page;
+
+        let documentsCount :number = await UserModel.countDocuments();
+        let totalPages :number = Math.ceil(documentsCount / size);
+
+        let userList  =
+            await UserModel.find().limit(size).skip(size * (page - 1));
+
+        userList.map(u => {
+            u.password=""
+        })
+
+        res.status(200).send(
+            new CustomResponse(
+                200,
+                "Users found",
+                userList,
+                totalPages
+            )
+        )
+
+    } catch (error){
+        res.status(500).send(
+            new CustomResponse(500,`Error : ${error}`)
+        )
+    }
 }
 
 export const authUser = async (req :express.Request, res :any) => {
