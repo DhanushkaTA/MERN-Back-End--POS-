@@ -29,3 +29,10 @@ export interface WarrantyInterface extends mongoose.Document{
     startDate: Date,
     expireDate: Date
 }
+
+export interface CustomerInterface {
+    nic:string,
+    fullName:string,
+    email:string,
+    phoneNumber:number
+}

@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose from "mongoose";
 import {WarrantyInterface} from "../types/SchemaTypes"
 
 let warrantySchema = new mongoose.Schema<WarrantyInterface>({

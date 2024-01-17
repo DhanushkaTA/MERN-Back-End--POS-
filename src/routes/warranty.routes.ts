@@ -4,7 +4,7 @@ import * as WarrantyController from "../controllers/warranty.controller";
 
 let router = express.Router();
 
-router.post('/add', VerifyToken.verifyToken, WarrantyController.addWarranty);
+router.post('/save', VerifyToken.verifyToken, WarrantyController.addWarranty);
 
 router.get('/get/all', VerifyToken.verifyToken, WarrantyController.getAllWarranty);
 

@@ -7,9 +7,10 @@ import bodyParser from "body-parser";
 import * as mongoose from "mongoose";
 import * as process from "process";
 
-import UserRouts from "./routes/user.routs";
+import UserRouts from "./routes/user.routes";
 import ItemRoutes from "./routes/item.routes";
-import WarrantyRoute from "./routes/warranty.route";
+import WarrantyRoute from "./routes/warranty.routes";
+import CustomerRoutes from "./routes/customer.routes";
 
 
 let app = express();
@@ -35,6 +36,8 @@ app.use('/user',UserRouts);
 app.use('/item',ItemRoutes);
 
 app.use('/warranty',WarrantyRoute);
+
+app.use('/customer',CustomerRoutes);
 
 //------------------------------------------
 
