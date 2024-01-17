@@ -92,12 +92,10 @@ export const updateUser = async (req :express.Request, res :any) => {
                         proPic:req.body.proPic
                     }
                 ).then( success => {
-
+                    // success object is old object
                     if (success){
-                        success.password="";
-
                         res.status(200).send(
-                            new CustomResponse(200,"User update successfully",success)
+                            new CustomResponse(200,"User update successfully")
                         )
                     }
 
