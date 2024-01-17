@@ -36,3 +36,10 @@ export interface CustomerInterface {
     email:string,
     phoneNumber:number
 }
+
+export interface LogInDetailInterface {
+    username:string,
+    role:string,
+    logInDate:Date,
+    logOutDate:Date
+}
