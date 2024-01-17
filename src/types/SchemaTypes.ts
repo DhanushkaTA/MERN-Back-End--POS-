@@ -21,3 +21,11 @@ export interface ItemInterface extends mongoose.Document{
     warranty: string,
     itemPic: string
 }
+
+export interface WarrantyInterface extends mongoose.Document{
+    itemId: string,
+    orderId: string,
+    description: string,
+    startDate: Date,
+    expireDate: Date
+}

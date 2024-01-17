@@ -3,7 +3,6 @@ import {CustomResponse} from "../dtos/custom.response";
 import ItemModel from "../models/item.model";
 import {ItemInterface} from "../types/SchemaTypes";
 
-
 export const saveItem = async (req :express.Request, res :any) => {
     try {
 
