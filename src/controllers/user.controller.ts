@@ -128,26 +128,24 @@ export const deleteUser = async (req :express.Request, res :any) => {
         let id :string = query_string.id;
 
         //is my account or not
-        if (res.tokenData.user._id != id){
+        if (res.tokenData.user._id == id || res.tokenData.user.role === "admin"){
             //if is not my account then check user role is admin
-            if (res.tokenData.user.role === "admin"){
 
-                await UserModel.deleteOne({_id:id}).then( success => {
-                    res.status(200).send(
-                        new CustomResponse(200, "User delete successfully")
-                    );
-                }).catch(error => {
-                    res.status(500).send(
-                        new CustomResponse(500, `Something went wrong : ${error}`)
-                    );
-                })
 
-            } else {
-                res.status(401).send(
-                    new CustomResponse(401,"Access Denied")
-                )
-            }
+            await UserModel.deleteOne({_id:id}).then( success => {
+                res.status(200).send(
+                    new CustomResponse(200, "User delete successfully")
+                );
+            }).catch(error => {
+                res.status(500).send(
+                    new CustomResponse(500, `Something went wrong : ${error}`)
+                );
+            })
 
+        }else {
+            res.status(401).send(
+                new CustomResponse(401,"Access Denied")
+            )
         }
 
     }catch (error){
