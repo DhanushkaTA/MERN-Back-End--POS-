@@ -8,6 +8,7 @@ import * as mongoose from "mongoose";
 import * as process from "process";
 
 import UserRouts from "./routes/user.routs";
+import ItemRoutes from "./routes/item.routes";
 
 
 let app = express();
@@ -26,6 +27,8 @@ mongoose.connect(process.env.MONGO_URL as string).then( r => {
 
 
 app.use('/user',UserRouts);
+
+app.use('/item',ItemRoutes);
 
 
 

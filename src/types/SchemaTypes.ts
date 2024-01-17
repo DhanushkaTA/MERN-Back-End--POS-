@@ -9,3 +9,15 @@ export interface UserInterface extends mongoose.Document{
     role: string,
     proPic: string
 }
+
+
+export interface ItemInterface extends mongoose.Document{
+    code: string,
+    description: string,
+    category: string,
+    brand: string,
+    price: number,
+    qty: number;
+    warranty: string,
+    itemPic: string
+}
