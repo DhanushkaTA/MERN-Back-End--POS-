@@ -26,7 +26,6 @@ export const uploadPic = multer({
         file.mimetype === 'image/png' ||
         file.mimetype === 'image/jpeg' ||
         file.mimetype === 'image/gif'){
-
             callback(null,true)
         }else {
             callback(null,false)
