@@ -12,6 +12,7 @@ import ItemRoutes from "./routes/item.routes";
 import WarrantyRoute from "./routes/warranty.routes";
 import CustomerRoutes from "./routes/customer.routes";
 import LogInDetailRoutes from "./routes/logInDetail.routes";
+import OrderRoutes from "./routes/order.routes";
 
 
 let app = express();
@@ -44,6 +45,8 @@ app.use('/warranty',WarrantyRoute);
 app.use('/customer',CustomerRoutes);
 
 app.use('/login',LogInDetailRoutes);
+
+app.use('/order',OrderRoutes);
 
 //------------------------------------------
 
