@@ -9,110 +9,147 @@ import userModel from "../models/user.model";
 import ImageModel from "../models/imageTest.model";
 import fs from 'fs'
 
-export const createUser = async (req : express.Request, res:any) => {
+export const createUser = async (req : any, res:any) => {
 
-    try {
+    if (req.fileError){
+        res.status(401).send(
+            new CustomResponse(401,"Image format not allow")
+        )
+    } else {
 
-        let user_by_email : UserInterface | null = await UserModel.findOne({email:req.body.email});
+        let fileName:string = req.file.filename;
+        let user_data = JSON.parse(req.body.user);
 
-        if (user_by_email){
-            res.status(409).send(
-                new CustomResponse(409,"Email already used!")
-            )
-        }else {
+        try {
 
-            let user_by_username : UserInterface | null = await UserModel.findOne({username:req.body.username});
+            let user_by_email : UserInterface | null = await UserModel.findOne({email:user_data.email});
 
-            if (user_by_username){
+            if (user_by_email){
+                //delete image
+                fs.unlinkSync(req.file.path);
 
                 res.status(409).send(
-                    new CustomResponse(409,"Username already used!")
+                    new CustomResponse(409,"Email already used!")
                 )
-
             }else {
 
-                bcrypt.hash(req.body.password, 8, async function (err, hash :string) {
+                let user_by_username : UserInterface | null = await UserModel.findOne({username:user_data.username});
 
-                    let userModel =  new UserModel({
-                        username: req.body.username,
-                        fullName: req.body.fullName,
-                        email: req.body.email,
-                        phoneNumber: req.body.phoneNumber,
-                        password: hash,
-                        role: req.body.role,
-                        proPic: "proPic"
-                    });
+                if (user_by_username){
+                    //delete image
+                    fs.unlinkSync(req.file.path);
 
-                    let user: UserInterface | null = await userModel.save()
+                    res.status(409).send(
+                        new CustomResponse(409,"Username already used!")
+                    )
 
-                    if (user){
-                        user.password="";
-                        res.status(200).send(
-                            new CustomResponse(
-                                200, "User saved successfully",user
+                }else {
+
+                    bcrypt.hash(user_data.password, 8, async function (err, hash :string) {
+
+                        let userModel =  new UserModel({
+                            username: user_data.username,
+                            fullName: user_data.fullName,
+                            email: user_data.email,
+                            phoneNumber: user_data.phoneNumber,
+                            password: hash,
+                            role:user_data.role,
+                            proPic: fileName
+                        });
+
+                        let user: UserInterface | null = await userModel.save()
+
+                        if (user){
+                            user.password="";
+                            res.status(200).send(
+                                new CustomResponse(
+                                    200, "User saved successfully",user
+                                )
+                            );
+                        }else {
+                            //delete image
+                            fs.unlinkSync(req.file.path);
+                            res.status(500).send(
+                                new CustomResponse(500,`Something went wrong!`)
                             )
-                        );
-                    }else {
-                        res.status(500).send(
-                            new CustomResponse(500,`Something went wrong!`)
-                        )
-                    }
+                        }
 
-                })
+                    })
+
+                }
 
             }
 
+
+        }catch (error){
+            res.status(500).send(
+                new CustomResponse(500,`Error : ${error}`)
+            )
         }
 
-
-    }catch (error){
-        res.status(500).send(
-            new CustomResponse(500,`Error : ${error}`)
-        )
     }
+
 
 }
 
-export const updateUser = async (req :express.Request, res :any) => {
+export const updateUser = async (req :any, res :any) => {
     try {
 
-        let user_by_username = await userModel.findOne({_id: req.body.id});
+        if (req.fileError){
+            res.status(401).send(
+                new CustomResponse(401,"Image format not allow")
+            )
+        } else {
 
-        if (user_by_username){
+            let fileName:string = req.file.filename;
+            let user_data = JSON.parse(req.body.user);
 
-            bcrypt.hash(req.body.password, 8, async function (err, hash :string) {
+            let user_by_username :UserInterface | null = await userModel.findOne({_id: user_data.id});
 
-                await UserModel.findByIdAndUpdate(
-                    {_id:req.body.id},
-                    {
-                        username:req.body.username,
-                        fullName:req.body.fullName,
-                        email:req.body.email,
-                        phoneNumber:req.body.phoneNumber,
-                        password:hash,
-                        role:req.body.role,
-                        proPic:req.body.proPic
-                    }
-                ).then( success => {
-                    // success object is old object
-                    if (success){
-                        res.status(200).send(
-                            new CustomResponse(200,"User update successfully")
+            if (user_by_username){
+
+                bcrypt.hash(user_data.password, 8, async function (err, hash :string) {
+
+                    await UserModel.findByIdAndUpdate(
+                        {_id:user_data.id},
+                        {
+                            username:user_data.username,
+                            fullName:user_data.fullName,
+                            email:user_data.email,
+                            phoneNumber:user_data.phoneNumber,
+                            password:hash,
+                            role:user_data.role,
+                            proPic:fileName
+                        }
+                    ).then( success => {
+                        // success object is old object
+                        if (success){
+                            //delete old image
+                            // @ts-ignore
+                            fs.unlinkSync('src/media/images/'+user_by_username.proPic);
+                            res.status(200).send(
+                                new CustomResponse(200,"User update successfully")
+                            )
+                        }
+
+                    }).catch(error => {
+                        //delete image
+                        fs.unlinkSync(req.file.path);
+                        res.status(500).send(
+                            new CustomResponse(500,`Error : ${error}`)
                         )
-                    }
+                    })
 
-                }).catch(error => {
-                    res.status(500).send(
-                        new CustomResponse(500,`Error : ${error}`)
-                    )
                 })
 
-            })
+            }else {
+                //delete image
+                fs.unlinkSync(req.file.path);
+                res.status(404).send(
+                    new CustomResponse(404,`User not found!!!`)
+                )
+            }
 
-        }else {
-            res.status(404).send(
-                new CustomResponse(404,`User not found!!!`)
-            )
         }
 
 
@@ -133,16 +170,27 @@ export const deleteUser = async (req :express.Request, res :any) => {
         if (res.tokenData.user._id == id || res.tokenData.user.role === "admin"){
             //if is not my account then check user role is admin
 
+            let user_by_id : UserInterface | null = await UserModel.findOne({_id:id});
 
-            await UserModel.deleteOne({_id:id}).then( success => {
-                res.status(200).send(
-                    new CustomResponse(200, "User delete successfully")
-                );
-            }).catch(error => {
-                res.status(500).send(
-                    new CustomResponse(500, `Something went wrong : ${error}`)
-                );
-            })
+            if (user_by_id) {
+                await UserModel.deleteOne({_id:id}).then( success => {
+
+                    //delete user image
+                    // @ts-ignore
+                    fs.unlinkSync(`src/media/images/${user_by_id.proPic}`);
+                    res.status(200).send(
+                        new CustomResponse(200, "User delete successfully")
+                    );
+                }).catch(error => {
+                    res.status(500).send(
+                        new CustomResponse(500, `Something went wrong : ${error}`)
+                    );
+                })
+            }else {
+                res.status(404).send(
+                    new CustomResponse(404,"User not found!")
+                )
+            }
 
         }else {
             res.status(401).send(

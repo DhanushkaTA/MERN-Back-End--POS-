@@ -1,15 +1,17 @@
 import multer from 'multer'
 import path from 'path'
-import express from "express";
-import e from "cors";
 
 export const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log("methwnta awa");
+        // console.log("methwnta awa");
         cb(null, 'src/media/images')
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname)
+
+        // let user_data = JSON.parse(req.body.user);
+        // console.log(user_data.username);
+
         cb(null, file.fieldname + '-' + uniqueSuffix)
     }
 })
