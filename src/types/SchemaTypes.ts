@@ -44,6 +44,20 @@ export interface LogInDetailInterface {
     logOutDate:Date
 }
 
+export interface OrderDetailsInterface{
+    itemId:string,
+    qty:number,
+    amount:number
+}
+
+export interface OrderInterface {
+    date:Date,
+    totalQty:number,
+    totalAmount:number,
+    customerId:string,
+    orderDetails:OrderDetailsInterface
+}
+
 export interface TestImageInterface {
     image:string
 }
