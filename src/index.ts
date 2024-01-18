@@ -16,11 +16,14 @@ import LogInDetailRoutes from "./routes/logInDetail.routes";
 
 let app = express();
 
+app.use(express.static('src/media'))
+
 app.use(cors({
     origin: "*"
 }))
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 //------------------------------------------
 

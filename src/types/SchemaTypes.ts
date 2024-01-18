@@ -43,3 +43,7 @@ export interface LogInDetailInterface {
     logInDate:Date,
     logOutDate:Date
 }
+
+export interface TestImageInterface {
+    image:string
+}

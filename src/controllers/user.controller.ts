@@ -6,6 +6,8 @@ import UserModel from "../models/user.model";
 import {UserInterface} from "../types/SchemaTypes";
 import jwt, {Secret} from "jsonwebtoken";
 import userModel from "../models/user.model";
+import ImageModel from "../models/imageTest.model";
+import fs from 'fs'
 
 export const createUser = async (req : express.Request, res:any) => {
 
@@ -244,4 +246,43 @@ const generateToken = (user: UserInterface, res :express.Response) => {
 
         }
     });
+}
+
+export const handleImage = async (req :any, res :any) => {
+
+    if (req.fileError){
+        res.status(401).send(
+            new CustomResponse(401,"Image format not allow")
+        )
+    } else {
+        let fileName:string = req.file.filename;
+        let body = JSON.parse(req.body.user);
+        console.log(body);
+
+        let imageModel = new ImageModel({
+            image:fileName
+        });
+
+        await imageModel.save().then(s => {
+
+            console.log(s)
+            if (s){
+                res.status(200).send(
+                    new CustomResponse(200,"Image saved")
+                )
+            }
+
+            // fs.unlinkSync(req.file.path);
+
+
+        }).catch(e => {
+            console.log(e)
+        })
+    }
+
+
+
+
+
+
 }
