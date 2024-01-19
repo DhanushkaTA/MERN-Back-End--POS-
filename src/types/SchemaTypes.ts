@@ -55,7 +55,7 @@ export interface OrderInterface {
     totalQty:number,
     totalAmount:number,
     customerId:string,
-    orderDetails:OrderDetailsInterface
+    orderDetails:OrderDetailsInterface[]
 }
 
 export interface TestImageInterface {
