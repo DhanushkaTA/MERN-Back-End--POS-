@@ -27,12 +27,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //------------------------------------------
-
+export let db:any;
 mongoose.connect(process.env.MONGO_URL as string).then( r => {
+    db=r;
     console.log("DB Connected Successfully")
 }).catch( error => {
     console.log(`DB Connection Error : ${error}`)
-})
+});
 
 //------------------------------------------
 
