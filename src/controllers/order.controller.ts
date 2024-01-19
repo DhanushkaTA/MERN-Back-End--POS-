@@ -5,6 +5,7 @@ import {ItemInterface, OrderDetailsInterface} from "../types/SchemaTypes";
 import ItemModel from "../models/item.model";
 import {db} from "../index";
 import {MongoClient} from 'mongodb'
+import process from "process";
 
 
 export const createOrder =  async (req :express.Request, res :any) => {
@@ -15,8 +16,8 @@ export const createOrder =  async (req :express.Request, res :any) => {
         readPreference: 'primary'
     };
 
-    const uri = 'mongodb://localhost:27017';
-    const client = new MongoClient(uri);
+    // const uri = 'mongodb://localhost:27017';
+    const client = new MongoClient(process.env.MONGO_URL as string);
 
     await client.connect();
     const session = client.startSession();
@@ -93,7 +94,7 @@ export const createOrder =  async (req :express.Request, res :any) => {
             )
         }else {
             res.status(500).send(
-                new CustomResponse(200,`wade kela una`)
+                new CustomResponse(500,`wade kela una`)
             )
         }
 
@@ -101,7 +102,7 @@ export const createOrder =  async (req :express.Request, res :any) => {
     }catch(e){
 
         res.status(500).send(
-            new CustomResponse(200,`wade kela una : ${e}`)
+            new CustomResponse(500,`wade kela una : ${e}`)
         )
         await session.abortTransaction();
 
