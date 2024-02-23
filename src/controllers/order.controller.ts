@@ -39,6 +39,8 @@ export const createOrder =  async (req :express.Request, res :any) => {
             let item_by_id =
                 await itemsCollection.findOne({code:item.itemId},{session});
 
+            // @ts-ignore// let item_by_id = await ItemModel.findOne({code:item.itemId}).session(session).exec()
+
             console.log("item_by_id : "+item_by_id);
 
             if (item_by_id) {
@@ -54,6 +56,10 @@ export const createOrder =  async (req :express.Request, res :any) => {
                     {$set:{qty:update_qty}},
                     {session}
                 )
+
+                // // @ts-ignore
+                // await ItemModel.findByIdAndUpdate({_id:item_by_id._id}, {$set:{qty:update_qty}}).session(session).exec()
+
             }else {
                 // await session.abortTransaction();
                 // res.status(500).send(
@@ -100,7 +106,7 @@ export const createOrder =  async (req :express.Request, res :any) => {
 
 
     }catch(e){
-
+        console.log(e)
         res.status(500).send(
             new CustomResponse(500,`wade kela una : ${e}`)
         )

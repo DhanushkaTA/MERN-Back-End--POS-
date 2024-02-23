@@ -20,9 +20,13 @@ export const createUser = async (req : any, res:any) => {
         let fileName:string = req.file.filename;
         let user_data = JSON.parse(req.body.user);
 
+        // console.log(req.body)
+
         try {
 
             let user_by_email : UserInterface | null = await UserModel.findOne({email:user_data.email});
+
+            // console.log(user_by_email)
 
             if (user_by_email){
                 //delete image
@@ -54,7 +58,7 @@ export const createUser = async (req : any, res:any) => {
                             phoneNumber: user_data.phoneNumber,
                             password: hash,
                             role:user_data.role,
-                            proPic: fileName
+                            proPic: `users/${fileName}`
                         });
 
                         let user: UserInterface | null = await userModel.save()
@@ -119,14 +123,14 @@ export const updateUser = async (req :any, res :any) => {
                             phoneNumber:user_data.phoneNumber,
                             password:hash,
                             role:user_data.role,
-                            proPic:fileName
+                            proPic:`users/${fileName}`
                         }
                     ).then( success => {
                         // success object is old object
                         if (success){
                             //delete old image
                             // @ts-ignore
-                            fs.unlinkSync('src/media/images/'+user_by_username.proPic);
+                            fs.unlinkSync('src/media/images/users/'+user_by_username.proPic);
                             res.status(200).send(
                                 new CustomResponse(200,"User update successfully")
                             )
@@ -177,7 +181,7 @@ export const deleteUser = async (req :express.Request, res :any) => {
 
                     //delete user image
                     // @ts-ignore
-                    fs.unlinkSync(`src/media/images/${user_by_id.proPic}`);
+                    fs.unlinkSync(`src/media/images/users/${user_by_id.proPic}`);
                     res.status(200).send(
                         new CustomResponse(200, "User delete successfully")
                     );
@@ -249,9 +253,7 @@ export const authUser = async (req :express.Request, res :any) => {
             let isMache :boolean = await bcrypt.compare(req.body.password, user.password);
 
             if (isMache) {
-
                 generateToken(user,res);
-
             }else {
                 res.status(401).json(
                     new CustomResponse(401,"Wrong Password!!!")

@@ -40,7 +40,7 @@ export const saveItem = async (req :any, res :any) => {
                         price: item_data.price,
                         qty: item_data.qty,
                         warranty: item_data.warranty,
-                        itemPic: fileName
+                        itemPic: `items/${fileName}`
                     });
 
                     await itemModel.save().then( success  => {
@@ -160,7 +160,7 @@ export const updateItem = async (req :any, res :any) => {
                             price: item_data.price,
                             qty: item_data.qty,
                             warranty: item_data.warranty,
-                            itemPic:fileName
+                            itemPic: `items/${fileName}`
                         }
                     ).then( success => {
                         // success object is old object
@@ -217,7 +217,7 @@ export const deleteItem = async (req :express.Request, res :any) => {
                 await ItemModel.deleteOne({_id: req.query.id})
                     .then( success => {
                         //delete image
-                        fs.unlinkSync(`src/media/images/${item_by_id?.itemPic}`);
+                        fs.unlinkSync(`src/media/images/items/${item_by_id?.itemPic}`);
 
                         res.status(200).send(
                             new CustomResponse(200, "User delete successfully")

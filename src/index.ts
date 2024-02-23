@@ -13,6 +13,7 @@ import WarrantyRoute from "./routes/warranty.routes";
 import CustomerRoutes from "./routes/customer.routes";
 import LogInDetailRoutes from "./routes/logInDetail.routes";
 import OrderRoutes from "./routes/order.routes";
+import BrandRoutes from "./routes/brand.routes";
 
 
 let app = express();
@@ -20,7 +21,8 @@ let app = express();
 app.use(express.static('src/media'))
 
 app.use(cors({
-    origin: "*"
+    origin: "*",
+    methods:"*"
 }))
 
 app.use(bodyParser.json());
@@ -49,8 +51,10 @@ app.use('/login',LogInDetailRoutes);
 
 app.use('/order',OrderRoutes);
 
+app.use('/brand',BrandRoutes);
+
 //------------------------------------------
 
-app.listen(8080, () => {
-    console.log("Server start on port 8080")
+app.listen(9000, () => {
+    console.log("Server start on port 9000")
 })

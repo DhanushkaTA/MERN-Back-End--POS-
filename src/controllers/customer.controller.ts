@@ -20,7 +20,7 @@ export const addCustomer = async (req :express.Request, res :any) => {
                 fullName:req.body.fullName,
                 email:req.body.email,
                 phoneNumber:req.body.phoneNumber
-            });
+            })
 
             await customerModel.save().then( success => {
                 res.status(200).send(

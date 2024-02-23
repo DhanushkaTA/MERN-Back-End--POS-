@@ -3,8 +3,23 @@ import path from 'path'
 
 export const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        // console.log("methwnta awa");
-        cb(null, 'src/media/images')
+
+        const formDataKeys = Object.keys(req.body);
+
+        console.log('FormData keys:', formDataKeys);
+
+        // if (formDataKeys[0]==='user'){
+        //     console.log("users inno ne");
+        //     cb(null, 'src/media/images/user')
+        // }else if (formDataKeys[0]==='item'){
+        //     console.log("item inno ne");
+        // }else {
+        //     cb(null, 'src/media/images')
+        // }
+
+        let path = getPath(formDataKeys[0]);
+
+        cb(null, path)
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname)
@@ -16,12 +31,25 @@ export const storage = multer.diskStorage({
     }
 })
 
+const getPath = (key :string) :string => {
+    switch (key) {
+        case 'user':
+            return 'src/media/images/users';
+        case 'item':
+            return 'src/media/images/items';
+        case 'brand':
+            return 'src/media/images/brands';
+        default:
+            return 'src/media/images';
+    }
+}
+
 
 export const uploadPic = multer({
     storage: storage,
     fileFilter(req: any, file: Express.Multer.File, callback: multer.FileFilterCallback) {
-        console.log(file.originalname)
-        console.log(file)
+        // console.log(file.originalname)
+        // console.log(file)
         if (file.mimetype === 'image/jpg' ||
         file.mimetype === 'image/png' ||
         file.mimetype === 'image/jpeg' ||
