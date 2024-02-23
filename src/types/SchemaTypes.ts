@@ -58,6 +58,11 @@ export interface OrderInterface {
     orderDetails:OrderDetailsInterface[]
 }
 
+export interface brandInterface {
+    name:string,
+    image:string
+}
+
 export interface TestImageInterface {
     image:string
 }
