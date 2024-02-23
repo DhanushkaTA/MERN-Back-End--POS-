@@ -60,6 +60,7 @@ export interface OrderInterface {
 
 export interface BrandInterface {
     name:string,
+    category:string
     image:string
 }
 
