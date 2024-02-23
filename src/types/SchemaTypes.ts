@@ -58,7 +58,7 @@ export interface OrderInterface {
     orderDetails:OrderDetailsInterface[]
 }
 
-export interface brandInterface {
+export interface BrandInterface {
     name:string,
     image:string
 }
