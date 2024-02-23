@@ -2,6 +2,7 @@ import {CustomResponse} from "../dtos/custom.response";
 import BrandModel from "../models/brand.model";
 import {BrandInterface} from "../types/SchemaTypes";
 import fs from "fs";
+import CustomerModel from "../models/customer.model";
 
 
 export const createBrand = async (req : any, res:any) => {
@@ -127,9 +128,93 @@ export const updateBrand = async (req : any, res:any) => {
 
 export const getBrand = async (req : any, res:any) => {
 
+    try {
+
+        let brand_by_name : BrandInterface | null= await BrandModel.findOne({name:req.params.brand});
+
+        if (brand_by_name) {
+            res.status(200).send(
+                new CustomResponse(200,"Brand found successfully",brand_by_name)
+            )
+        } else {
+            res.status(404).send(
+                new CustomResponse(404,"Brand not fount!!!")
+            )
+        }
+
+    }catch (error){
+        res.status(500).send(
+            new CustomResponse(500,`Error : ${error}`)
+        )
+    }
+
+}
+
+export const getAllBrandsByCategory = async (req :any, res:any) => {
+
+    try {
+
+        let brand_list : BrandInterface[] = await BrandModel.find({category:req.params.category});
+
+        res.status(200).send(
+            new CustomResponse(
+                200,
+                "Brands found successfully.",
+                brand_list)
+        )
+
+    }catch (error){
+        res.status(500).send(
+            new CustomResponse(500,`Error : ${error}`)
+        )
+    }
+
 }
 
 export const getAllBrands = async (req : any, res:any) => {
+
+    try {
+
+        let query_string :any = req.query;
+        let size :number = query_string.size;
+        let page :number = query_string.page;
+        let category :string = query_string.category;
+
+        let documentCount :number = await BrandModel.countDocuments();
+        let brand_list = [];
+
+        if (category==='all'){
+            brand_list = await CustomerModel.find().limit(size).skip(size * (page - 1));
+
+        } else if (size===-1){
+            documentCount = await BrandModel.countDocuments({category:category});
+            brand_list = await CustomerModel.find({category:category});
+
+        } else if (category==='all' && size===-1){
+            brand_list = await CustomerModel.find();
+
+        } else {
+            documentCount = await BrandModel.countDocuments({category:category});
+            brand_list = await CustomerModel.find({category:category}).limit(size).skip(size * (page - 1));
+        }
+
+        let totalPages :number = Math.ceil(documentCount / size);
+
+
+
+        res.status(200).send(
+            new CustomResponse(
+                200,
+                "Brands found successfully.",
+                brand_list,
+                totalPages)
+        )
+
+    }catch (error){
+        res.status(500).send(
+            new CustomResponse(500,`Error : ${error}`)
+        )
+    }
 
 }
 

@@ -9,10 +9,12 @@ router.post('/save', VerifyToken.verifyToken, uploadPic.single('file'), BrandCon
 
 router.put('/update', VerifyToken.verifyToken , uploadPic.single('file'), BrandController.updateBrand)
 
-router.get('get/brand/:brand_name', VerifyToken.verifyToken, BrandController.getBrand)
+router.get('get/all/category/:category', VerifyToken.verifyToken, BrandController.getAllBrandsByCategory)
 
-router.get('get/all', VerifyToken.verifyToken, BrandController.getAllBrands)
+router.get('get/all', VerifyToken.verifyToken, BrandController.getAllBrands) // query string -> ?size=,page=,category=
 
-router.delete('delete/:brand_name', VerifyToken.verifyToken, BrandController.deleteBrand)
+router.get('get/brand/:brand', VerifyToken.verifyToken, BrandController.getBrand)
+
+router.delete('delete/:brand', VerifyToken.verifyToken, BrandController.deleteBrand)
 
 export default router;
