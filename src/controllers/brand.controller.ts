@@ -29,6 +29,7 @@ export const createBrand = async (req : any, res:any) => {
 
                 let brandModel = new BrandModel({
                     name:brand_data.name,
+                    category:brand_data.category,
                     image: `brands/${fileName}`
                 });
 
