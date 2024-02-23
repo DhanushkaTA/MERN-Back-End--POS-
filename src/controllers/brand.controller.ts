@@ -52,6 +52,8 @@ export const createBrand = async (req : any, res:any) => {
 
 
         }catch (error){
+            //delete image
+            fs.unlinkSync(req.file.path);
             res.status(500).send(
                 new CustomResponse(500,`Error : ${error}`)
             )
@@ -61,6 +63,65 @@ export const createBrand = async (req : any, res:any) => {
 }
 
 export const updateBrand = async (req : any, res:any) => {
+
+    if (req.fileError){
+        res.status(401).send(
+            new CustomResponse(401,"Image format not allow")
+        )
+    }else {
+        let fileName:string = req.file.filename;
+        let brand_data = JSON.parse(req.body.brand);
+
+        try {
+            let brand_by_name : BrandInterface | null= await BrandModel.findOne({name:brand_data.name});
+
+            console.log(brand_by_name)
+
+            if (brand_by_name){
+
+                //update brad details --------------------------------------------------------------------
+
+                await BrandModel.findByIdAndUpdate(
+                    {_id:brand_data.id},
+                    {
+                        name:brand_data.name,
+                        category:brand_data.category,
+                        image: `brands/${fileName}`
+                    }
+                ).then(success => {
+                    if (success){
+                        //delete old image---------------------------------
+                        // fs.unlinkSync('src/media/images/brands/'+brand_by_name?.image);
+
+                        res.status(200).send(
+                            new CustomResponse(200,"User update successfully")
+                        )
+                    }
+                }).catch(error => {
+                    //delete image
+                    fs.unlinkSync(req.file.path);
+                    res.status(500).send(
+                        new CustomResponse(500,`Error : ${error}`)
+                    )
+                })
+
+            }else {
+                //delete image
+                fs.unlinkSync(req.file.path);
+                res.status(409).send(
+                    new CustomResponse(409,"Brand not found!")
+                )
+            }
+
+        }catch (error){
+            //delete image
+            fs.unlinkSync(req.file.path);
+            res.status(500).send(
+                new CustomResponse(500,`Error : ${error}`)
+            )
+        }
+
+    }
 
 }
 
