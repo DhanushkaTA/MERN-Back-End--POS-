@@ -13,12 +13,15 @@ export interface UserInterface extends mongoose.Document{
 
 export interface ItemInterface extends mongoose.Document{
     code: string,
+    name:string,
     description: string,
     category: string,
     brand: string,
-    price: number,
+    regularPrice: number,
+    salePrice: number,
     qty: number;
     warranty: string,
+    stockStatus: boolean
     itemPic: string
 }
 
@@ -47,6 +50,7 @@ export interface LogInDetailInterface {
 export interface OrderDetailsInterface{
     itemId:string,
     qty:number,
+    unitPrice:number
     amount:number
 }
 
@@ -60,7 +64,7 @@ export interface OrderInterface {
 
 export interface BrandInterface {
     name:string,
-    category:string
+    category:string[]
     image:string
 }
 

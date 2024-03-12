@@ -4,6 +4,7 @@ import {OrderDetailsInterface, OrderInterface} from "../types/SchemaTypes";
 let orderDetailSchema = new mongoose.Schema<OrderDetailsInterface>({
     itemId:{type: String, required: true},
     qty:{type: Number, required: true},
+    unitPrice:{type: Number, required:true},
     amount:{type: Number, required: true}
 });
 

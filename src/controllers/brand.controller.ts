@@ -183,19 +183,25 @@ export const getAllBrands = async (req : any, res:any) => {
         let documentCount :number = await BrandModel.countDocuments();
         let brand_list = [];
 
-        if (category==='all'){
-            brand_list = await CustomerModel.find().limit(size).skip(size * (page - 1));
+        console.log(category+" : "+size)
 
-        } else if (size===-1){
+        if (category==='All' && size!=-1){
+            console.log(1)
+            brand_list = await BrandModel.find().limit(size).skip(size * (page - 1));
+
+        } else if (size==-1 && category!='All'){
+            console.log(2)
             documentCount = await BrandModel.countDocuments({category:category});
-            brand_list = await CustomerModel.find({category:category});
+            brand_list = await BrandModel.find({category:category});
 
-        } else if (category==='all' && size===-1){
-            brand_list = await CustomerModel.find();
+        } else if (category==='All' && size==-1){
+            console.log(3)
+            brand_list = await BrandModel.find();
 
         } else {
+            console.log(4)
             documentCount = await BrandModel.countDocuments({category:category});
-            brand_list = await CustomerModel.find({category:category}).limit(size).skip(size * (page - 1));
+            brand_list = await BrandModel.find({category:category}).limit(size).skip(size * (page - 1));
         }
 
         let totalPages :number = Math.ceil(documentCount / size);
@@ -219,5 +225,36 @@ export const getAllBrands = async (req : any, res:any) => {
 }
 
 export const deleteBrand = async (req : any, res:any) => {
+    try {
 
+        let brand_by_name : BrandInterface | null= await BrandModel.findOne({name:req.params.brand});
+
+        if (brand_by_name){
+
+            await BrandModel.deleteOne({name:req.params.brand})
+                .then(success => {
+
+                fs.unlinkSync(`src/media/images/${brand_by_name?.image}`);
+                res.status(200).send(
+                    new CustomResponse(200, "Brand delete successfully")
+                );
+            })
+                .catch(error => {
+                    console.log(error)
+                    res.status(500).send(
+                        new CustomResponse(500, `Something went wrong : ${error}`)
+                    );
+                })
+
+        }else {
+            res.status(404).send(
+                new CustomResponse(404,`Brand not found!`)
+            )
+        }
+
+    }catch (error){
+        res.status(500).send(
+            new CustomResponse(500,`Error : ${error}`)
+        )
+    }
 }

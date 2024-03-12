@@ -34,12 +34,15 @@ export const saveItem = async (req :any, res :any) => {
 
                     let itemModel : ItemInterface = new ItemModel({
                         code: item_data.code,
+                        name: item_data.name,
                         description: item_data.description,
                         category: item_data.category,
                         brand: item_data.brand,
-                        price: item_data.price,
+                        regularPrice: item_data.regularPrice,
+                        salePrice: item_data.salePrice,
                         qty: item_data.qty,
                         warranty: item_data.warranty,
+                        stockStatus: item_data.stockStatus,
                         itemPic: `items/${fileName}`
                     });
 
@@ -101,6 +104,39 @@ export const getItemById = async (req :express.Request, res :any) => {
     }
 }
 
+export const getItemByName = async (req :express.Request, res :any) => {
+
+    console.log("awa")
+
+    try {
+
+        let query_string :any = req.query;
+        let name: string =query_string.name;
+
+        console.log(name)
+
+        let item_by_name :ItemInterface[] | null = await ItemModel.find({name: new RegExp(name,'i')});
+        // let item_by_name :ItemInterface[] | null = await ItemModel.find({name:{ $regex: name }});
+        // let item_by_count = await ItemModel.find({name: name}).countDocuments();
+
+        if (item_by_name){
+            res.status(200).send(
+                new CustomResponse(200,"Item found successfully.",item_by_name)
+            )
+        }else {
+            res.status(404).send(
+                new CustomResponse(404,"Item not found!!!")
+            )
+        }
+
+    }catch (error){
+        res.status(500).send(
+            new CustomResponse(500,`Error : ${error}`)
+        )
+    }
+
+}
+
 export const getAllItems = async (req :express.Request, res :any) => {
     try {
 
@@ -108,16 +144,40 @@ export const getAllItems = async (req :express.Request, res :any) => {
         let size :number = query_string.size;
         let page :number = query_string.page;
 
-        let documentCount :number = await ItemModel.countDocuments();
-        let totalPages :number = Math.ceil(documentCount / size);
+        let category :string = query_string.category;
+        let brand :string = query_string.brand;
 
-        let itemList = await ItemModel.find().limit(size).skip(size * (page - 1));
+        let documentCount :number = 0;
+
+
+        let itemList=[]
+
+        if (category!='All' && brand!='All'){
+            //get data when category and brand both are different
+            documentCount = await ItemModel.countDocuments({category:category,brand:brand});
+            itemList = await ItemModel.find({category:category,brand:brand}).limit(size).skip(size * (page - 1));
+        }else if (category=='All' && brand!='All'){
+            //get data only brand both are different
+            documentCount = await ItemModel.countDocuments({brand:brand});
+            itemList = await ItemModel.find({brand:brand}).limit(size).skip(size * (page - 1));
+        }else if (category!='All' && brand=='All'){
+            //get data only category both are different
+            documentCount = await ItemModel.countDocuments({category:category});
+            itemList = await ItemModel.find({category:category}).limit(size).skip(size * (page - 1));
+        }else {
+            //get data all data without filtered
+            documentCount = await ItemModel.countDocuments();
+            itemList = await ItemModel.find().limit(size).skip(size * (page - 1));
+        }
+
+        let totalPages :number = Math.ceil(documentCount / size);
 
         res.status(200).send(
             new CustomResponse(
                 200,
                 "Items found",
                 itemList,
+                documentCount,
                 totalPages
             )
         )
@@ -154,12 +214,15 @@ export const updateItem = async (req :any, res :any) => {
                         {_id: item_data.id},
                         {
                             code: item_data.code,
+                            name: item_data.name,
                             description: item_data.description,
                             category: item_data.category,
                             brand: item_data.brand,
-                            price: item_data.price,
+                            regularPrice: item_data.regularPrice,
+                            salePrice: item_data.salePrice,
                             qty: item_data.qty,
                             warranty: item_data.warranty,
+                            stockStatus: item_data.stockStatus,
                             itemPic: `items/${fileName}`
                         }
                     ).then( success => {
@@ -217,7 +280,7 @@ export const deleteItem = async (req :express.Request, res :any) => {
                 await ItemModel.deleteOne({_id: req.query.id})
                     .then( success => {
                         //delete image
-                        fs.unlinkSync(`src/media/images/items/${item_by_id?.itemPic}`);
+                        fs.unlinkSync(`src/media/images/${item_by_id?.itemPic}`);
 
                         res.status(200).send(
                             new CustomResponse(200, "User delete successfully")

@@ -4,7 +4,7 @@ import * as SchemaType from "../types/SchemaTypes";
 let brandSchema =
     new mongoose.Schema<SchemaType.BrandInterface>({
     name:{type:String, required:true},
-    category:{type:String, required:true},
+    category:{type:[String], required:true},
     image:{type:String, required:true}
 });
 

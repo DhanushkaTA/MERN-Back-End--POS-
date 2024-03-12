@@ -17,6 +17,8 @@ export const storage = multer.diskStorage({
         //     cb(null, 'src/media/images')
         // }
 
+        console.log(formDataKeys[0])
+
         let path = getPath(formDataKeys[0]);
 
         cb(null, path)
@@ -32,6 +34,7 @@ export const storage = multer.diskStorage({
 })
 
 const getPath = (key :string) :string => {
+    console.log(key)
     switch (key) {
         case 'user':
             return 'src/media/images/users';

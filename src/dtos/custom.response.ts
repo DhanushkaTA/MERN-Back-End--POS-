@@ -3,12 +3,14 @@ export class CustomResponse {
     private _status :number;
     private _message :string;
     private _data? :any;
+    private _totalRecodes? :number;
     private _totalPages? :number;
 
-    constructor(status :number, message :string, data?:any, totalPages?:number) {
+    constructor(status :number, message :string, data?:any, totalRecodes?:number, totalPages?:number) {
         this._status=status;
         this._message=message;
         this._data=data;
+        this._totalRecodes=totalRecodes;
         this._totalPages=totalPages;
     }
 
@@ -37,6 +39,14 @@ export class CustomResponse {
         this._totalPages = value;
     }
 
+    get totalRecodes(): number {
+        return<number> this._totalRecodes;
+    }
+
+    set totalRecodes(value: number) {
+        this._totalRecodes = value;
+    }
+
     get data(): any {
         return this._data;
     }
@@ -50,6 +60,7 @@ export class CustomResponse {
             status:this.status,
             message:this.message,
             data:this.data,
+            totalRecodes:this.totalRecodes,
             totalPages:this.totalPages
         }
     }

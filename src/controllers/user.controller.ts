@@ -130,7 +130,8 @@ export const updateUser = async (req :any, res :any) => {
                         if (success){
                             //delete old image
                             // @ts-ignore
-                            fs.unlinkSync('src/media/images/users/'+user_by_username.proPic);
+                            // fs.unlinkSync('src/media/images/users/'+user_by_username.proPic);
+                            fs.unlinkSync('src/media/images/'+user_by_username.proPic);
                             res.status(200).send(
                                 new CustomResponse(200,"User update successfully")
                             )
@@ -179,9 +180,10 @@ export const deleteUser = async (req :express.Request, res :any) => {
             if (user_by_id) {
                 await UserModel.deleteOne({_id:id}).then( success => {
 
-                    //delete user image
+                    //delete user image -----------------------------------------------------------
                     // @ts-ignore
-                    fs.unlinkSync(`src/media/images/users/${user_by_id.proPic}`);
+                    // fs.unlinkSync(`src/media/images/users/${user_by_id.proPic}`);
+                    fs.unlinkSync(`src/media/images/${user_by_id.proPic}`);
                     res.status(200).send(
                         new CustomResponse(200, "User delete successfully")
                     );
