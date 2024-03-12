@@ -19,7 +19,7 @@ export const saveItem = async (req :any, res :any) => {
             let fileName:string = req.file.filename;
             let item_data = JSON.parse(req.body.item);
 
-            if (user.role === 'admin') {
+            if (user.role === 'Admin') {
 
                 let item_by_code : ItemInterface | null = await ItemModel.findOne({code: item_data.code});
 
@@ -86,6 +86,17 @@ export const getItemById = async (req :express.Request, res :any) => {
         let code : string =query_string.code;
 
         let item_by_code :ItemInterface | null = await ItemModel.findOne({code: code});
+
+        const content = 'Some content!';
+
+        // fs.readFile(`src/media/images/${item_by_code?.itemPic}`, 'utf8', (err, data) => {
+        //     if (err) {
+        //         console.error('Error reading file:', err);
+        //     } else {
+        //         // Process the file content (data variable)
+        //         console.log('File content:', data);
+        //     }
+        // });
 
         if (item_by_code){
             res.status(200).send(
@@ -201,10 +212,10 @@ export const updateItem = async (req :any, res :any) => {
         }else {
 
             let user = res.tokenData.user;
-            let fileName:string = req.file.filename;
+            let fileName:string = req?.file?.filename;
             let item_data = JSON.parse(req.body.item);
 
-            if (user.role === 'admin') {
+            if (user.role === 'Admin') {
 
                 let item_by_id : ItemInterface | null = await ItemModel.findOne({_id: item_data.id});
 
@@ -223,11 +234,17 @@ export const updateItem = async (req :any, res :any) => {
                             qty: item_data.qty,
                             warranty: item_data.warranty,
                             stockStatus: item_data.stockStatus,
-                            itemPic: `items/${fileName}`
+                            itemPic: fileName ? `items/${fileName}` : item_data.itemPic
                         }
                     ).then( success => {
                         // success object is old object
                         //if you want you can return req body object
+
+                        if(fileName){
+                            //delete image
+                            fs.unlinkSync(`src/media/images/${item_by_id?.itemPic}`);
+                        }
+
                         res.status(200).send(
                             new CustomResponse(200,"Item update successfully")
                         )
@@ -271,7 +288,7 @@ export const deleteItem = async (req :express.Request, res :any) => {
 
         let user = res.tokenData.user;
 
-        if (user.role === 'admin'){
+        if (user.role === 'Admin'){
 
             let item_by_id : ItemInterface | null = await ItemModel.findOne({_id: req.query.id});
 

@@ -29,6 +29,8 @@ export const storage = multer.diskStorage({
         // let user_data = JSON.parse(req.body.user);
         // console.log(user_data.username);
 
+        // console.log(file)
+
         cb(null, file.fieldname + '-' + uniqueSuffix)
     }
 })
