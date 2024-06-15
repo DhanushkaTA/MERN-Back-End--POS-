@@ -6,7 +6,7 @@ import {upload, uploadPic} from "../middlewares/imageUplode";
 let router = express.Router();
 
 // Create user
-router.post('/save',  uploadPic.single('file'), UserController.createUser)
+router.post('/save',VerifyToken.verifyToken,  uploadPic.single('file'), UserController.createUser)
 
 router.put('/update', VerifyToken.verifyToken, uploadPic.single('file'), UserController.updateUser)
 

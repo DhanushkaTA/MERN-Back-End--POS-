@@ -4,7 +4,7 @@ import OrderModel from "../models/order.model";
 import {ItemInterface, OrderDetailsInterface} from "../types/SchemaTypes";
 import ItemModel from "../models/item.model";
 import {db} from "../index";
-import {MongoClient} from 'mongodb'
+import {MongoClient, ObjectId} from 'mongodb'
 import process from "process";
 
 
@@ -241,7 +241,13 @@ export const getAllOrders = async (req :express.Request, res :any) => {
         let order_list = await OrderModel.find().limit(size).skip(size * (page - 1));
 
         res.status(200).send(
-            new CustomResponse(200,"Order found successfully",order_list,totalPages)
+            new CustomResponse(
+                200,
+                "Order found successfully",
+                order_list,
+                documentCount,
+                totalPages
+            )
         )
 
     }catch (error) {
@@ -255,25 +261,50 @@ export const getOrderById = async (req :express.Request, res :any) => {
     try {
 
         let query:any = req.query;
-        let orderId :string = query.order;
+        let size :number = query.size;
+        let page :number = query.page;
 
-        let order_by_id = await OrderModel.findOne({_id:orderId});
+        if(isValidObjectId(req.params.id)){
+            let documentsCount: number = await OrderModel.countDocuments({_id: req.params.id});
+            let totalPages :number = Math.ceil(documentsCount / size);
 
-        if (order_by_id){
+
+            let order_list =
+                await OrderModel.find(
+                    {_id: req.params.id}).limit(size).skip(size * (page - 1));
+
             res.status(200).send(
-                new CustomResponse(200,"Order found successfully",order_by_id)
-            );
+                new CustomResponse(
+                    200,
+                    "Orders found",
+                    order_list,
+                    documentsCount,
+                    totalPages
+                )
+            )
         }else {
-            res.status(404).send(
-                new CustomResponse(404,`Order not found!!!`)
+            res.status(200).send(
+                new CustomResponse(
+                    200,
+                    "Orders not found!",
+                    [],
+                    0,
+                    1
+                )
             )
         }
+
+
 
     }catch (error) {
         res.status(500).send(
             new CustomResponse(500,`Error : ${error}`)
         )
     }
+}
+
+function isValidObjectId(id:string) {
+    return ObjectId.isValid(id) && (String(new ObjectId(id)) === id);
 }
 
 const isExitsOrder = async (orderId:string, res:any)=> {

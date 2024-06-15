@@ -105,47 +105,94 @@ export const updateUser = async (req :any, res :any) => {
             )
         } else {
 
-            let fileName:string = req.file.filename;
+            let fileName:string = req?.file?.filename;
             let user_data = JSON.parse(req.body.user);
 
-            let user_by_username :UserInterface | null = await userModel.findOne({_id: user_data.id});
+            console.log(user_data)
 
+            let user_by_username :UserInterface | null = await userModel.findOne({_id: user_data.id});
+            console.log("----")
+            console.log(user_by_username)
             if (user_by_username){
 
-                bcrypt.hash(user_data.password, 8, async function (err, hash :string) {
+                console.log("//////////////")
+                console.log(user_by_username)
 
-                    await UserModel.findByIdAndUpdate(
-                        {_id:user_data.id},
-                        {
+                await UserModel.findByIdAndUpdate(
+                    {_id:user_data.id},
+                    {
+                        $set: {
                             username:user_data.username,
                             fullName:user_data.fullName,
                             email:user_data.email,
                             phoneNumber:user_data.phoneNumber,
-                            password:hash,
                             role:user_data.role,
-                            proPic:`users/${fileName}`
+                            proPic:fileName ? `users/${fileName}` : user_by_username?.proPic
                         }
-                    ).then( success => {
-                        // success object is old object
-                        if (success){
-                            //delete old image
+                    }
+                ).then( success => {
+                    // success object is old object
+                    if (success){
+                        //delete old image
+
+                        // fs.unlinkSync('src/media/images/users/'+user_by_username.proPic);
+
+                        if (fileName){
                             // @ts-ignore
-                            // fs.unlinkSync('src/media/images/users/'+user_by_username.proPic);
                             fs.unlinkSync('src/media/images/'+user_by_username.proPic);
-                            res.status(200).send(
-                                new CustomResponse(200,"User update successfully")
-                            )
                         }
-
-                    }).catch(error => {
-                        //delete image
-                        fs.unlinkSync(req.file.path);
-                        res.status(500).send(
-                            new CustomResponse(500,`Error : ${error}`)
+                        res.status(200).send(
+                            new CustomResponse(200,"User update successfully")
                         )
-                    })
+                    }
 
+                }).catch(error => {
+                    //delete image
+                    if (fileName){
+                        fs.unlinkSync(req.file.path);
+                    }
+                    console.log(error)
+                    res.status(500).send(
+                        new CustomResponse(500,`Error : ${error}`)
+                    )
                 })
+
+                // if (user_by_username){
+                //
+                //     bcrypt.hash(user_data.password, 8, async function (err, hash :string) {
+                //
+                //         await UserModel.findByIdAndUpdate(
+                //             {_id:user_data.id},
+                //             {
+                //                 username:user_data.username,
+                //                 fullName:user_data.fullName,
+                //                 email:user_data.email,
+                //                 phoneNumber:user_data.phoneNumber,
+                //                 password:hash,
+                //                 role:user_data.role,
+                //                 proPic:fileName ? `users/${fileName}` : user_by_username?.proPic
+                //             }
+                //         ).then( success => {
+                //             // success object is old object
+                //             if (success){
+                //                 //delete old image
+                //                 // @ts-ignore
+                //                 // fs.unlinkSync('src/media/images/users/'+user_by_username.proPic);
+                //                 fs.unlinkSync('src/media/images/'+user_by_username.proPic);
+                //                 res.status(200).send(
+                //                     new CustomResponse(200,"User update successfully")
+                //                 )
+                //             }
+                //
+                //         }).catch(error => {
+                //             //delete image
+                //             fs.unlinkSync(req.file.path);
+                //             res.status(500).send(
+                //                 new CustomResponse(500,`Error : ${error}`)
+                //             )
+                //         })
+
+                    // })
 
             }else {
                 //delete image

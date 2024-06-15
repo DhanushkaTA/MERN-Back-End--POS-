@@ -14,5 +14,5 @@ router.get('/get/all/:username', VerifyToken.verifyToken, LogInDetailController.
 
 router.get('/get/recode', VerifyToken.verifyToken, LogInDetailController.getLoginRecodeById)//query string ?id=
 
-router.put('/update', VerifyToken.verifyToken, LogInDetailController.updateLoginRecode)
+router.put('/update', LogInDetailController.updateLoginRecode)
 export default router;

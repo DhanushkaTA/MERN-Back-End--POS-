@@ -54,7 +54,13 @@ export const getAllLoginRecodes = async (req :express.Request, res :any) => {
                 await LogInDetailModel.find().limit(size).skip(size * (page - 1));
 
             res.status(200).send(
-                new CustomResponse(200,"Login Details found",recode_list,totalPages)
+                new CustomResponse(
+                    200,
+                    "Login Details found",
+                    recode_list,
+                    documentsCount,
+                    totalPages
+                )
             )
 
         }else {
@@ -80,14 +86,21 @@ export const getAllLoginRecodesByUsername = async (req :express.Request, res :an
             let page :number = query_string.page;
 
             let documentsCount :number =
-                await LogInDetailModel.countDocuments({username:req.params.username});
+                await LogInDetailModel.countDocuments({username: new RegExp(req.params.username,'i')});
             let totalPages :number = Math.ceil(documentsCount / size);
 
             let recode_list :LogInDetailInterface[] | null =
-                await LogInDetailModel.find({username:req.params.username}).limit(size).skip(size * (page - 1));
+                await LogInDetailModel.find({username: new RegExp(req.params.username,'i')})
+                    .limit(size).skip(size * (page - 1));
 
             res.status(200).send(
-                new CustomResponse(200,"Login Details found",recode_list,totalPages)
+                new CustomResponse(
+                    200,
+                    "Login Details found",
+                    recode_list,
+                    documentsCount,
+                    totalPages
+                )
             )
 
         }else {

@@ -10,7 +10,7 @@ router.put('/update', VerifyToken.verifyToken, OrderController.updateOrder)
 
 router.get('/get/all', VerifyToken.verifyToken, OrderController.getAllOrders)//query string?size=page=
 
-router.get('/get/order', VerifyToken.verifyToken, OrderController.getOrderById)//query string ?order=
+router.get('/get/order/:id', VerifyToken.verifyToken, OrderController.getOrderById)//query string ?order=
 
 router.delete('/delete', VerifyToken.verifyToken, OrderController.deleteOrder)//query string ?order
 

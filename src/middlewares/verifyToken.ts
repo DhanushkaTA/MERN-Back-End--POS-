@@ -9,7 +9,7 @@ export const verifyToken = async (req :express.Request, res :any, next: express.
 
     if (!authorizationToken){
         return res.status(401).json(
-            new CustomResponse(401, "Invalid Token")
+            new CustomResponse(404, "Token not found!")
         )
     }
 

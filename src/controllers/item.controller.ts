@@ -215,7 +215,7 @@ export const updateItem = async (req :any, res :any) => {
             let fileName:string = req?.file?.filename;
             let item_data = JSON.parse(req.body.item);
 
-            if (user.role === 'Admin') {
+            if (user.role === 'admin') {
 
                 let item_by_id : ItemInterface | null = await ItemModel.findOne({_id: item_data.id});
 
@@ -251,7 +251,9 @@ export const updateItem = async (req :any, res :any) => {
 
                     }).catch(error => {
                         //delete image
-                        fs.unlinkSync(req.file.path);
+                        if(fileName){
+                            fs.unlinkSync(`src/media/images/${item_by_id?.itemPic}`);
+                        }
                         res.status(500).send(
                             new CustomResponse(500,`Error : ${error}`)
                         )
@@ -259,7 +261,9 @@ export const updateItem = async (req :any, res :any) => {
 
                 } else {
                     //delete image
-                    fs.unlinkSync(req.file.path);
+                    if(fileName){
+                        fs.unlinkSync(req.file.path);
+                    }
                     res.status(404).send(
                         new CustomResponse(404, "Item not found!!!")
                     )
@@ -268,7 +272,9 @@ export const updateItem = async (req :any, res :any) => {
 
             }else {
                 //delete image
-                fs.unlinkSync(req.file.path);
+                if(fileName){
+                    fs.unlinkSync(req.file.path);
+                }
                 res.status(401).send(
                     new CustomResponse(401,"Access Denied")
                 )

@@ -105,7 +105,7 @@ export const updateCustomer = async (req :express.Request, res :any) => {
                     nic:req.body.nic,
                     fullName:req.body.fullName,
                     email:req.body.email,
-                    phoneNumber:req.body.phoneNumber
+                    phoneNumber:req.body.phoneNumber,
                 }
             ).then(success => {
                 res.status(200).send(
