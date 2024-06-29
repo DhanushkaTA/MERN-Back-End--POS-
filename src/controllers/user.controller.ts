@@ -29,8 +29,10 @@ export const createUser = async (req : any, res:any) => {
             // console.log(user_by_email)
 
             if (user_by_email){
-                //delete image
-                fs.unlinkSync(req.file.path);
+               if (fileName){
+                   //delete image
+                   fs.unlinkSync(req.file.path);
+               }
 
                 res.status(409).send(
                     new CustomResponse(409,"Email already used!")
@@ -40,8 +42,10 @@ export const createUser = async (req : any, res:any) => {
                 let user_by_username : UserInterface | null = await UserModel.findOne({username:user_data.username});
 
                 if (user_by_username){
-                    //delete image
-                    fs.unlinkSync(req.file.path);
+                    if (fileName){
+                        //delete image
+                        fs.unlinkSync(req.file.path);
+                    }
 
                     res.status(409).send(
                         new CustomResponse(409,"Username already used!")
@@ -71,8 +75,10 @@ export const createUser = async (req : any, res:any) => {
                                 )
                             );
                         }else {
-                            //delete image
-                            fs.unlinkSync(req.file.path);
+                            if (fileName){
+                                //delete image
+                                fs.unlinkSync(req.file.path);
+                            }
                             res.status(500).send(
                                 new CustomResponse(500,`Something went wrong!`)
                             )
@@ -86,6 +92,10 @@ export const createUser = async (req : any, res:any) => {
 
 
         }catch (error){
+            if (fileName){
+                //delete image
+                fs.unlinkSync(req.file.path);
+            }
             res.status(500).send(
                 new CustomResponse(500,`Error : ${error}`)
             )

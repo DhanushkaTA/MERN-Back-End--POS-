@@ -10,182 +10,74 @@ import process from "process";
 
 export const createOrder =  async (req :express.Request, res :any) => {
 
-    const transactionOptions = {
-        readConcern: { level: 'snapshot' },
-        writeConcern: { w: 'majority' },
-        readPreference: 'primary'
-    };
 
-    // const uri = 'mongodb://localhost:27017';
-    const client = new MongoClient(process.env.MONGO_URL as string);
-
-    await client.connect();
-    const session = client.startSession();
 
     try {
-        session.startTransaction();
-        const itemsCollection = client.db('nextGenIt').collection('orders');
+
+        let session = await OrderModel.startSession();
+
+        await session.withTransaction(async () => {
 
 
-        //-------------------- update items -----------------------------------------------------------------
 
-        let orderDetails: OrderDetailsInterface[] = req.body.orderDetails;
+            //-------------------- update items -----------------------------------------------------------------
+
+            let orderDetails: OrderDetailsInterface[] = req.body.orderDetails;
 
 
-        for (let item of orderDetails){
+            for (let item of orderDetails){
 
-            console.log("item : "+item.itemId)
+                console.log("item : "+item.itemId)
 
-            let item_by_id =
-                await itemsCollection.findOne({code:item.itemId},{session});
+                let item_by_id =
+                    await ItemModel.findOne({code:item.itemId});
 
-            // @ts-ignore// let item_by_id = await ItemModel.findOne({code:item.itemId}).session(session).exec()
 
-            console.log("item_by_id : "+item_by_id);
+                console.log("item_by_id : "+item_by_id);
 
-            if (item_by_id) {
-                // let qty_On_hand :number = item_by_id.qty;
-                // let qty_in_order:number = item.qty;
-                let update_qty :number = (item_by_id.qty - item.qty);
+                if (item_by_id) {
+                    let update_qty :number = (item_by_id.qty - item.qty);
 
-                console.log(item_by_id.qty)
-                console.log(item.qty)
+                    console.log(item_by_id.qty)
+                    console.log(item.qty)
 
-                await itemsCollection.updateOne(
-                    {code:item.itemId},
-                    {$set:{qty:update_qty}},
-                    {session}
-                )
 
-                // // @ts-ignore
-                // await ItemModel.findByIdAndUpdate({_id:item_by_id._id}, {$set:{qty:update_qty}}).session(session).exec()
+                    await ItemModel.findByIdAndUpdate(
+                        {_id:item_by_id._id},
+                        {$set:{qty:update_qty}}
+                    ).session(session).exec()
 
-            }else {
-                // await session.abortTransaction();
-                // res.status(500).send(
-                //     new CustomResponse(500,`Error : Something wrong with item`)
-                // )
-                throw new Error(`Error : Something wrong with item`)
+                }else {
+                    throw new Error(`Error : Something wrong with item`)
+                }
             }
-        }
 
-        //-------------------- update items -----------------------------------------------------------------
+            //-------------------- update items -----------------------------------------------------------------
 
-        const ordersCollection = client.db('nextGenIt').collection('orders');
-
-        // let orderModel = new OrderModel({
-        //     date:req.body.date,
-        //     totalQty:req.body.totalQty,
-        //     totalAmount:req.body.totalAmount,
-        //     customerId:req.body.customerId,
-        //     orderDetails:req.body.orderDetails
-        // });
-        //
-        // let newVar = await orderModel.save();
-
-        let insertOne = await ordersCollection.insertOne({
-            date:req.body.date,
-            totalQty:req.body.totalQty,
-            totalAmount:req.body.totalAmount,
-            customerId:req.body.customerId,
-            orderDetails:req.body.orderDetails
-        },{session});
+            let insertOne = await OrderModel.create([{
+                date:req.body.date,
+                totalQty:req.body.totalQty,
+                totalAmount:req.body.totalAmount,
+                customerId:req.body.customerId,
+                orderDetails:req.body.orderDetails
+            }],{session});
 
 
 
-        if (insertOne) {
-            await session.commitTransaction();
-            res.status(200).send(
-                new CustomResponse(200,`hari`)
-            )
-        }else {
-            res.status(500).send(
-                new CustomResponse(500,`wade kela una`)
-            )
-        }
+        })
 
+        await session.endSession()
+
+        res.status(500).send(
+            new CustomResponse(200,`Order saves successfully`)
+        )
 
     }catch(e){
         console.log(e)
         res.status(500).send(
             new CustomResponse(500,`wade kela una : ${e}`)
         )
-        await session.abortTransaction();
-
-    }finally {
-        await session.endSession();
     }
-
-
-
-
-
-
-    // try {
-    //
-    //     let orderDetails: OrderDetailsInterface[] = req.body.orderDetails;
-    //
-    //     console.log(orderDetails)
-    //     // console.log(orderDetails[1])
-    //
-    //
-    //     for (let item of orderDetails){
-    //
-    //         console.log("item : "+item.itemId)
-    //
-    //         // @ts-ignore
-    //         let item_by_id : ItemInterface | null = await ItemModel.find({_id:item.itemId});
-    //
-    //         console.log("item_by_id : "+item_by_id)
-    //
-    //         if (item_by_id) {
-    //             let qty_On_hand :number = item_by_id.qty;
-    //             let qty_in_order:number = item.qty;
-    //             let update_qty :number = Math.ceil(qty_On_hand - qty_in_order);
-    //
-    //             console.log(typeof update_qty)
-    //
-    //             await ItemModel.updateOne(
-    //                 {_id:item.itemId},
-    //                 {
-    //                     description:item_by_id.description,
-    //                     category:item_by_id.category,
-    //                     brand:item_by_id.brand,
-    //                     price:item_by_id.price,
-    //                     qty:update_qty,
-    //                     warranty:item_by_id.warranty,
-    //                     itemPic:item_by_id.itemPic
-    //                 }
-    //             )
-    //         }
-    //     }
-    //
-    //     let orderModel = new OrderModel({
-    //         date:req.body.date,
-    //         totalQty:req.body.totalQty,
-    //         totalAmount:req.body.totalAmount,
-    //         customerId:req.body.customerId,
-    //         orderDetails:req.body.orderDetails
-    //     });
-    //
-    //     let newVar = await orderModel.save();
-    //
-    //     if (newVar) {
-    //         res.status(200).send(
-    //             new CustomResponse(200,`hari`)
-    //         )
-    //     }else {
-    //         res.status(500).send(
-    //             new CustomResponse(200,`wade kela una`)
-    //         )
-    //     }
-    //
-    //
-    // } catch (error) {
-    //     res.status(500).send(
-    //         new CustomResponse(500,`Error : ${error}`)
-    //     )
-    // }
 }
 
 export const updateOrder = async (req :express.Request, res :any) => {
