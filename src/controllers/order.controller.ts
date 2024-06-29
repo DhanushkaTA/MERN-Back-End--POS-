@@ -30,7 +30,7 @@ export const createOrder =  async (req :express.Request, res :any) => {
                 console.log("item : "+item.itemId)
 
                 let item_by_id =
-                    await ItemModel.findOne({code:item.itemId});
+                    await ItemModel.findOne({_id:item.itemId});
 
 
                 console.log("item_by_id : "+item_by_id);
@@ -68,7 +68,7 @@ export const createOrder =  async (req :express.Request, res :any) => {
 
         await session.endSession()
 
-        res.status(500).send(
+        res.status(200).send(
             new CustomResponse(200,`Order saves successfully`)
         )
 

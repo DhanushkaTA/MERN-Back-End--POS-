@@ -5,7 +5,8 @@ let orderDetailSchema = new mongoose.Schema<OrderDetailsInterface>({
     itemId:{type: String, required: true},
     qty:{type: Number, required: true},
     unitPrice:{type: Number, required:true},
-    amount:{type: Number, required: true}
+    amount:{type: Number, required: true},
+    pic:{type: String, required: false}
 });
 
 let orderSchema = new mongoose.Schema<OrderInterface>({
