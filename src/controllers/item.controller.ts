@@ -3,16 +3,19 @@ import {CustomResponse} from "../dtos/custom.response";
 import ItemModel from "../models/item.model";
 import {ItemInterface} from "../types/SchemaTypes";
 import fs from 'fs'
+import {AppError} from "../utils/AppError";
 
-export const saveItem = async (req :any, res :any) => {
+export const saveItem = async (req :any, res :any,next:express.NextFunction) => {
     try {
 
         if (req.fileError){
             //delete image
             fs.unlinkSync(req.file.path);
-            res.status(401).send(
-                new CustomResponse(401,"Image format not allow")
-            )
+            // res.status(401).send(
+            //     new CustomResponse(401,"Image format not allow")
+            // )
+            throw new AppError("Image format not allow",401)
+
         }else {
 
             let user = res.tokenData.user;
@@ -46,7 +49,8 @@ export const saveItem = async (req :any, res :any) => {
                         itemPic: `items/${fileName}`
                     });
 
-                    await itemModel.save().then( success  => {
+                    await itemModel.save()
+                        .then( success  => {
 
                         res.status(200).send(
                             new CustomResponse(200,"Item saved successfully.",success)
@@ -73,13 +77,14 @@ export const saveItem = async (req :any, res :any) => {
         }
 
     }catch (error){
-        res.status(500).send(
-            new CustomResponse(500,`Error : ${error}`)
-        )
+        // res.status(500).send(
+        //     new CustomResponse(500,`Error : ${error}`)
+        // )
+        next(error)
     }
 }
 
-export const getItemById = async (req :express.Request, res :any) => {
+export const getItemById = async (req :express.Request, res :any, next:express.NextFunction) => {
     try {
 
         let query_string :any = req.query;
@@ -115,7 +120,7 @@ export const getItemById = async (req :express.Request, res :any) => {
     }
 }
 
-export const getItemByName = async (req :express.Request, res :any) => {
+export const getItemByName = async (req :express.Request, res :any, next:express.NextFunction) => {
 
     console.log("awa")
 
@@ -148,7 +153,7 @@ export const getItemByName = async (req :express.Request, res :any) => {
 
 }
 
-export const getAllItems = async (req :express.Request, res :any) => {
+export const getAllItems = async (req :express.Request, res :any, next:express.NextFunction) => {
     try {
 
         let query_string :any=req.query;
@@ -200,7 +205,7 @@ export const getAllItems = async (req :express.Request, res :any) => {
     }
 }
 
-export const updateItem = async (req :any, res :any) => {
+export const updateItem = async (req :any, res :any, next:express.NextFunction) => {
     try {
 
         if (req.fileError){
@@ -289,7 +294,7 @@ export const updateItem = async (req :any, res :any) => {
     }
 }
 
-export const deleteItem = async (req :express.Request, res :any) => {
+export const deleteItem = async (req :express.Request, res :any, next:express.NextFunction) => {
     try {
 
         let user = res.tokenData.user;
@@ -309,21 +314,24 @@ export const deleteItem = async (req :express.Request, res :any) => {
                             new CustomResponse(200, "User delete successfully")
                         );
                 }).catch(error => {
-                        res.status(500).send(
-                            new CustomResponse(500, `Something went wrong : ${error}`)
-                        );
+                        // res.status(500).send(
+                        //     new CustomResponse(500, `Something went wrong : ${error}`)
+                        // );
+                        next(error)
                 })
 
             } else {
-                res.status(404).send(
-                    new CustomResponse(404, "Item not found!!!")
-                )
+                // res.status(404).send(
+                //     new CustomResponse(404, "Item not found!!!")
+                // )
+                throw new AppError("Item not found!!!",404)
             }
 
         } else {
-            res.status(401).send(
-                new CustomResponse(401,"Access Denied")
-            )
+            // res.status(401).send(
+            //     new CustomResponse(401,"Access Denied")
+            // )
+            throw new AppError("Access Denied",401)
         }
 
     }catch (error){

@@ -15,6 +15,7 @@ import LogInDetailRoutes from "./routes/logInDetail.routes";
 import OrderRoutes from "./routes/order.routes";
 import BrandRoutes from "./routes/brand.routes";
 import DetailsRoutes from "./routes/details.routes";
+import * as GlobalErrorHandler from '../src/exception/ExceptionHandler'
 
 
 let app = express();
@@ -57,6 +58,9 @@ app.use('/brand',BrandRoutes);
 app.use('/details',DetailsRoutes)
 
 //------------------------------------------
+
+//set global error handler middleware
+app.use(GlobalErrorHandler.exceptionHandler)
 
 app.listen(9000, () => {
     console.log("Server start on port 9000")

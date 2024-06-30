@@ -73,9 +73,10 @@ export const getDetails = async (
         )
 
     }catch (error){
-        res.status(500).send(
-            new CustomResponse(500,`Error : ${error}`)
-        )
+        // res.status(500).send(
+        //     new CustomResponse(500,`Error : ${error}`)
+        // )
+        next(error)
     }
 
 }

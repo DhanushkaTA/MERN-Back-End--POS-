@@ -2,9 +2,10 @@ import express from "express";
 import {CustomResponse} from "../dtos/custom.response";
 import LogInDetailModel from "../models/logInDetail.model";
 import {LogInDetailInterface} from "../types/SchemaTypes";
+import {AppError} from "../utils/AppError";
 
 
-export const addLoginDetail = async (req :express.Request, res :any) => {
+export const addLoginDetail = async (req :express.Request, res :any, next:express.NextFunction) => {
     try {
 
         let query_string :any = req.query;
@@ -26,19 +27,15 @@ export const addLoginDetail = async (req :express.Request, res :any) => {
             )
 
         }else {
-            res.status(500).send(
-                new CustomResponse(500,`Something went wrong`)
-            )
+            throw new AppError(`Something went wrong`,500)
         }
 
     }catch (error) {
-        res.status(500).send(
-            new CustomResponse(500,`Error : ${error}`)
-        )
+        next(error)
     }
 }
 
-export const getAllLoginRecodes = async (req :express.Request, res :any) => {
+export const getAllLoginRecodes = async (req :express.Request, res :any, next:express.NextFunction) => {
     try {
 
         if (res.tokenData.user.role === "admin"){
@@ -70,13 +67,14 @@ export const getAllLoginRecodes = async (req :express.Request, res :any) => {
         }
 
     }catch (error) {
-        res.status(500).send(
-            new CustomResponse(500,`Error : ${error}`)
-        )
+        // res.status(500).send(
+        //     new CustomResponse(500,`Error : ${error}`)
+        // )
+        next(error)
     }
 }
 
-export const getAllLoginRecodesByUsername = async (req :express.Request, res :any) => {
+export const getAllLoginRecodesByUsername = async (req :express.Request, res :any, next:express.NextFunction) => {
     try {
 
         if (res.tokenData.user.role === "admin"){
@@ -110,14 +108,15 @@ export const getAllLoginRecodesByUsername = async (req :express.Request, res :an
         }
 
     }catch (error) {
-        res.status(500).send(
-            new CustomResponse(500,`Error : ${error}`)
-        )
+        // res.status(500).send(
+        //     new CustomResponse(500,`Error : ${error}`)
+        // )
+        next(error)
     }
 }
 
 
-export const getLoginRecodeById = async (req :express.Request, res :any) => {
+export const getLoginRecodeById = async (req :express.Request, res :any, next:express.NextFunction) => {
     try {
 
         if (res.tokenData.user.role === "admin"){
@@ -132,25 +131,25 @@ export const getLoginRecodeById = async (req :express.Request, res :any) => {
                     new CustomResponse(200, "Recode found",recode)
                 )
             }else {
-                res.status(404).send(
-                    new CustomResponse(404, "Recode not found")
-                )
+                // res.status(404).send(
+                //     new CustomResponse(404, "Recode not found")
+                // )
+                throw new AppError("Recode not found",404)
             }
 
         } else {
-            res.status(401).send(
-                new CustomResponse(401,"Access Denied")
-            )
+            throw new AppError("Access Denied",401)
         }
 
     }catch (error) {
-        res.status(500).send(
-            new CustomResponse(500,`Error : ${error}`)
-        )
+        // res.status(500).send(
+        //     new CustomResponse(500,`Error : ${error}`)
+        // )
+        next(error)
     }
 }
 
-export const updateLoginRecode = async (req :express.Request, res :any) => {
+export const updateLoginRecode = async (req :express.Request, res :any, next:express.NextFunction) => {
     try {
 
         console.log(req.body.id)
@@ -159,24 +158,21 @@ export const updateLoginRecode = async (req :express.Request, res :any) => {
 
         console.log(recode)
 
-        if (recode) {
-
-            await LogInDetailModel.updateOne({_id:req.body.id}, {$set: {logOutDate:req.body.logOutDate}})
-                .then(success => {
-                    res.status(200).send(
-                        new CustomResponse(200,"Recode update successfully")
-                    )
-            }).catch(error => {
-                    res.status(500).send(
-                        new CustomResponse(500,`Error : ${error}`)
-                    )
-            })
-
-        }else {
-            res.status(404).send(
-                new CustomResponse(404, "Recode not found")
-            )
+        if (!recode) {
+            throw new AppError("Recode not found",404)
         }
+
+        await LogInDetailModel.updateOne({_id:req.body.id}, {$set: {logOutDate:req.body.logOutDate}})
+            .then(success => {
+                res.status(200).send(
+                    new CustomResponse(200,"Recode update successfully")
+                )
+            }).catch(error => {
+                // res.status(500).send(
+                //     new CustomResponse(500,`Error : ${error}`)
+                // )
+                next(error)
+            })
 
     }catch (error) {
         res.status(500).send(
