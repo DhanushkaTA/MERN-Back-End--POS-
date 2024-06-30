@@ -145,14 +145,15 @@ export const updateUser = async (req :any, res :any) => {
                     if (success){
                         //delete old image
 
-                        // fs.unlinkSync('src/media/images/users/'+user_by_username.proPic);
-
                         if (fileName){
                             // @ts-ignore
                             fs.unlinkSync('src/media/images/'+user_by_username.proPic);
                         }
+
+                        success.password="";
+
                         res.status(200).send(
-                            new CustomResponse(200,"User update successfully")
+                            new CustomResponse(200,"User update successfully",success)
                         )
                     }
 

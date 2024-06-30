@@ -153,7 +153,11 @@ export const getLoginRecodeById = async (req :express.Request, res :any) => {
 export const updateLoginRecode = async (req :express.Request, res :any) => {
     try {
 
+        console.log(req.body.id)
+
         let recode :LogInDetailInterface | null = await LogInDetailModel.findOne({_id:req.body.id});
+
+        console.log(recode)
 
         if (recode) {
 

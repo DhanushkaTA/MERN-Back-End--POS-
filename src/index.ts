@@ -14,6 +14,7 @@ import CustomerRoutes from "./routes/customer.routes";
 import LogInDetailRoutes from "./routes/logInDetail.routes";
 import OrderRoutes from "./routes/order.routes";
 import BrandRoutes from "./routes/brand.routes";
+import DetailsRoutes from "./routes/details.routes";
 
 
 let app = express();
@@ -52,6 +53,8 @@ app.use('/login',LogInDetailRoutes);
 app.use('/order',OrderRoutes);
 
 app.use('/brand',BrandRoutes);
+
+app.use('/details',DetailsRoutes)
 
 //------------------------------------------
 
